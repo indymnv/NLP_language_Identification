@@ -1,0 +1,12 @@
+{
+  "project": "nlp_language_identification",
+  "version": "1.0.0",
+  "dependencies": {
+    "python": "^3.10.6",
+    "pandas": "^1.5.0",
+    "numpy": "^1.23.03",
+    "tensorflow": "^2.10.0",
+    "squarify": "^0.4.3",
+    "scikit-learn": "^1.1.2"
+  }
+}
