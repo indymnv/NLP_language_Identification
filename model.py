@@ -29,7 +29,7 @@ for root, dirs, files in os.walk('./data'):
 
 ## vamos a medir el TIME de esta shit
 
-df = pd.read_csv("./data/sentences.csv")
+df = pd.read_csv("./data/sentences.csv", nrows = 10_000)
 
 ## eliminar columna maldita que esta de mas ID
 df.drop(columns=['id'],inplace=True)
@@ -166,6 +166,7 @@ class NLPModel(tf.keras.Model):
         
         self.classifier = layers.Dense(num_classes, activation = 'softmax')
         
+    @tf.function()
     def call(self, inputs, training = False):
         x = self.embedding(inputs)
         x = self.lstm1(x)
@@ -215,3 +216,7 @@ cbar = ax.collections[0].colorbar
 cbar.set_ticks([0, .25, 0.5, .75, 1])
 cbar.set_ticklabels(['0%', '25%', '50%', '75%', '100%'])
 plt.savefig('heatmap-result.jpeg')
+
+model = NLPModel()
+#model.labels = tf.saved_model.Asset('./models/nlp.txt')
+tf.saved_model.save(model, './models/')
