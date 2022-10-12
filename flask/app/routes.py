@@ -1,5 +1,6 @@
 from flask import jsonify
 from flask import render_template
+from app import process
 
 from app import app #, podria importar APP si lo llego a ocupar en app.py
 
@@ -9,6 +10,5 @@ def home():
 
 @app.route('/identification', methods=['GET'])
 def runModel():
-  valores = "valore calculado"
+  valores =process.init()
   return render_template('index.html', output = valores)
-  
