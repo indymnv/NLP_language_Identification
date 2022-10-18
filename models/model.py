@@ -20,6 +20,7 @@ from sklearn.metrics import  confusion_matrix, accuracy_score
 import seaborn as sns
 import matplotlib.pyplot as plt
 import squarify
+import pickle
 
 ## print paths
 for root, dirs, files in os.walk('./data'):
@@ -108,37 +109,33 @@ NUM_WORDS = 1000000
 MAX_LEN = 100
 NUM_CLASSES = 404 # esto lo sacamos de arriba
 
-def tokenize_and_sequence(
-                            train_sentences,
-                            test_sentences
-                            ):
+def create_tokenizer(
+        df_train
+        ):
     tok = Tokenizer(num_words = NUM_WORDS, oov_token='<OOV>')
-    tok.fit_on_texts(train_sentences)
-    
+    tok.fit_on_texts(df_train)
     # training set
-    train_seq = tok.texts_to_sequences(train_sentences)
+   
+    return tok
+
+def tokenize_df(
+        tok,
+        df,
+        ):
+    train_seq = tok.texts_to_sequences(df)
     train_seq = pad_sequences(
                     train_seq,
                     padding = 'post',
                     maxlen = MAX_LEN,
                     truncating = 'post'
                 )
-    
-    # testing set
-    test_seq = tok.texts_to_sequences(test_sentences)
-    test_seq = pad_sequences(
-                    test_seq,
-                    padding = 'post',
-                    maxlen = MAX_LEN,
-                    truncating = 'post'
-                )
-    if _DEBUG:
-        print(tok.get_config())
-    
-    return train_seq, test_seq, tok
+    return train_seq
 
 ## call function 
-X_train, X_test, tok = tokenize_and_sequence(X_train, X_test)
+#X_train, X_test, tok = tokenize_and_sequence(X_train, X_test)
+tok = create_tokenizer(X_train)
+X_train = tokenize_df(tok, X_train)
+X_test = tokenize_df(tok, X_test)
 
 # WARNING: problemas de tiempo de respuesta, se debe cambiar la config del notebook
 
@@ -217,6 +214,20 @@ cbar.set_ticks([0, .25, 0.5, .75, 1])
 cbar.set_ticklabels(['0%', '25%', '50%', '75%', '100%'])
 plt.savefig('heatmap-result.jpeg')
 
-model = NLPModel()
+#model = NLPModel()
 #model.labels = tf.saved_model.Asset('./models/nlp.txt')
+with open("./models/tok.pickle", "wb") as handle:
+    pickle.dump(tok, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    
 tf.saved_model.save(model, './models/')
+
+#model.save("./models/model_test.h5", save_format="tf")
+
+#del tok
+
+# loading
+
+#savedModel=tf.keras.models.load_model('./models/model.h5')
+
+#with open('./models/tok.pickle', 'rb') as handle:
+#    tok = pickle.load(handle)
